@@ -511,3 +511,28 @@ class GitExportClientTest(GitClientTestSetups):
         self.assertTrue(os.path.exists(self.basepath_export + '.tar.gz'))
         self.assertFalse(os.path.exists(self.basepath_export + '.tar'))
         self.assertFalse(os.path.exists(self.basepath_export))
+
+
+class GitGetBranchesClientTest(GitClientTestSetups):
+
+    @classmethod
+    def setUpClass(self):
+        GitClientTestSetups.setUpClass()
+
+    def tearDown(self):
+        pass
+
+    def testGetBranches(self):
+        client = GitClient(self.local_path)
+        client.checkout(self.remote_path)
+        self.assertEqual(client.get_branches(True), ['master'])
+        self.assertEqual(client.get_branches(),
+                         ['master', 'remotes/origin/master',
+                          'remotes/origin/test_branch'])
+        subprocess.check_call('git checkout test_branch', shell=True,
+                              cwd=self.local_path, stdout=subprocess.PIPE,
+                              stderr=subprocess.PIPE)
+        self.assertEqual(client.get_branches(True), ['master', 'test_branch'])
+        self.assertEqual(client.get_branches(),
+                         ['master', 'test_branch', 'remotes/origin/master',
+                          'remotes/origin/test_branch'])

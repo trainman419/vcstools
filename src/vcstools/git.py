@@ -546,6 +546,22 @@ class GitClient(VcsClientBase):
         os.remove(basepath + '.tar')
         return True
 
+    def get_branches(self, local_only=False):
+        cmd = 'git branch --no-color'
+        if not local_only:
+            cmd += ' -a'
+        result, out, err = run_shell_command(cmd,
+                                             cwd=self._path,
+                                             shell=True,
+                                             show_stdout=False)
+        branches = []
+        for line in out.splitlines():
+            if line.count('HEAD -> ') > 0:
+                continue
+            line = line.strip('*').strip()
+            branches.append(line)
+        return branches
+
     def _do_fetch(self):
         """calls git fetch"""
         value, _, _ = run_shell_command("git fetch",
