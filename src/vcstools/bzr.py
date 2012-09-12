@@ -219,6 +219,9 @@ class BzrClient(VcsClientBase):
             response = response_processed
         return response
 
+    def get_branches(self, local_only=False):
+        raise NotImplementedError("get_branches is not implemented for bzr")
+
     def export_repository(self, version, basepath):
         # execute the bzr export cmd
         cmd = 'bzr export --format=tgz {0} '.format(basepath + '.tar.gz')
