@@ -231,5 +231,16 @@ class SvnClient(VcsClientBase):
         rmtree(basepath)
         return True
 
+    def get_branches(self, local_only=False):
+        branches_dir = os.path.join(self._path, 'branches')
+        branches = []
+        if os.path.exists(branches_dir):
+            for item in os.listdir(branches_dir):
+                if item == '.svn':
+                    continue
+                if os.path.isdir(os.path.join(branches_dir, item)):
+                    branches.append(item)
+        return branches
+
 
 SVNClient = SvnClient

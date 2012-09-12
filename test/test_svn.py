@@ -268,3 +268,42 @@ class SvnExportRepositoryClientTest(SvnClientTestSetups):
         self.assertTrue(os.path.exists(self.basepath_export + '.tar.gz'))
         self.assertFalse(os.path.exists(self.basepath_export + '.tar'))
         self.assertFalse(os.path.exists(self.basepath_export))
+
+
+class SvnGetBranchesClientTest(SvnClientTestSetups):
+
+    @classmethod
+    def setUpClass(self):
+        SvnClientTestSetups.setUpClass()
+        client = SvnClient(self.local_path)
+        client.checkout(self.local_url)
+
+    def tearDown(self):
+        pass
+
+    def test_get_branches(self):
+        client = SvnClient(self.local_path)
+        self.assertEqual(client.get_branches(), [])
+        # Create a properly laid out svn repo
+        remote_dir = os.path.join(self.root_directory, 'remote_proper')
+        subprocess.check_call("svnadmin create %s" % remote_dir, shell=True,
+                              cwd=self.root_directory)
+        local_url = "file://localhost" + remote_dir
+        init_path = os.path.join(self.root_directory, 'init_proper')
+        subprocess.check_call("svn checkout %s %s" % (local_url, init_path),
+                              shell=True, cwd=self.root_directory)
+        subprocess.check_call("mkdir tags branches trunk",
+                              shell=True, cwd=init_path)
+        subprocess.check_call("touch {0}".format(os.path.join('trunk', 'a.c')),
+                              shell=True, cwd=init_path)
+        subprocess.check_call("svn add ./*",
+                              shell=True, cwd=init_path)
+        subprocess.check_call("svn ci -m 'Initial commit.'",
+                              shell=True, cwd=init_path)
+        client = SvnClient(init_path)
+        self.assertEqual(client.get_branches(), [])
+        branch = os.path.join('branches', 'test_branch')
+        subprocess.check_call("svn copy {0} {1}".format('trunk', branch),
+                              shell=True, cwd=init_path)
+        # Test get_branches
+        self.assertEqual(client.get_branches(), ['test_branch'])
