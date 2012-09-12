@@ -276,3 +276,25 @@ class HGExportRepositoryClientTest(HGClientTestSetups):
         self.assertTrue(os.path.exists(self.basepath_export + '.tar.gz'))
         self.assertFalse(os.path.exists(self.basepath_export + '.tar'))
         self.assertFalse(os.path.exists(self.basepath_export))
+
+
+class HGGetBranchesClientTest(HGClientTestSetups):
+
+    @classmethod
+    def setUpClass(self):
+        HGClientTestSetups.setUpClass()
+        url = self.local_url
+        client = HgClient(self.local_path)
+        client.checkout(url)
+
+    def tearDown(self):
+        pass
+
+    def test_get_branches(self):
+        client = HgClient(self.local_path)
+        # Make a branch
+        subprocess.check_call('hg branch test_branch', shell=True,
+                              cwd=self.local_path, stdout=subprocess.PIPE)
+        subprocess.check_call('hg commit -m "Making test_branch"', shell=True,
+                              cwd=self.local_path, stdout=subprocess.PIPE)
+        self.assertEqual(client.get_branches(), ['test_branch', 'default'])
