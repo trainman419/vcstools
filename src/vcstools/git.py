@@ -126,7 +126,7 @@ def _get_git_version():
 
 
 class GitClient(VcsClientBase):
-    def __init__(self, path, cache=True):
+    def __init__(self, path, cache=False):
         """
         :raises: VcsError if git not detected
         """
@@ -158,12 +158,12 @@ class GitClient(VcsClientBase):
         :returns: GIT URL of the directory path (output of git info command), or None if it cannot be determined
         """
         if self.url:
-           return self.url
+            return self.url
         if self.detect_presence():
             cmd = "git config --get remote.origin.url"
             _, output, _ = run_shell_command(cmd, shell=True, cwd=self._path)
             if self.cache:
-               self.url = output.rstrip()
+                self.url = output.rstrip()
             return output.rstrip()
         return None
 
@@ -309,11 +309,11 @@ class GitClient(VcsClientBase):
         if self.detect_presence():
             # pull results from cache if available
             if spec is None:
-               if self.version:
-                  return self.version
+                if self.version:
+                    return self.version
             else:
-               if spec in self.versions:
-                  return self.versions[spec]
+                if spec in self.versions:
+                    return self.versions[spec]
 
             command = "git log -1"
             if spec is not None:
@@ -336,10 +336,10 @@ class GitClient(VcsClientBase):
             # On Windows the version can have single quotes around it
             output = output.strip("'")
             if self.cache:
-               if spec is None:
-                  self.version = output
-               else:
-                  self.versions[spec] = output
+                if spec is None:
+                    self.version = output
+                else:
+                    self.versions[spec] = output
             return output
         return None
 
@@ -641,7 +641,7 @@ class GitClient(VcsClientBase):
         :raises: GitError when call fails
         """
         if self.fetch:
-           return
+            return
         cmd = "git fetch"
         value1, _, _ = run_shell_command(cmd,
                                          cwd=self._path,
@@ -655,7 +655,8 @@ class GitClient(VcsClientBase):
                                          show_stdout=True)
         if value1 != 0 or value2 != 0:
             raise GitError('git fetch failed')
-        self.fetch = True
+        if self.cache:
+            self.fetch = True
 
     def _do_fast_forward(self, fetch=True, branch_parent=None, verbose=False):
         """Execute git fetch if necessary, and if we can fast-foward,
@@ -735,6 +736,8 @@ class GitClient(VcsClientBase):
                                         cwd=self._path,
                                         show_stdout=verbose,
                                         verbose=verbose)
+        if self.cache:
+            self.version = None
         if value != 0:
             raise GitError('Git Checkout failed')
 
