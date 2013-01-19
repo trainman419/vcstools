@@ -69,7 +69,7 @@ def _get_bzr_version():
 
 
 class BzrClient(VcsClientBase):
-    def __init__(self, path):
+    def __init__(self, path, cache=False):
         """
         :raises: VcsError if bzr not detected
         """

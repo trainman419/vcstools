@@ -60,7 +60,7 @@ _METADATA_FILENAME = ".tar"
 
 class TarClient(VcsClientBase):
 
-    def __init__(self, path):
+    def __init__(self, path, cache=False):
         """
         @raise VcsError if tar not detected
         """

@@ -65,7 +65,7 @@ def get_vcs(vcs_type):
     return vcs_class
 
 
-def get_vcs_client(vcs_type, path):
+def get_vcs_client(vcs_type, path, cache=False):
     """
     Returns a client with which to interact with the vcs at given path
 
@@ -74,7 +74,7 @@ def get_vcs_client(vcs_type, path):
     :raises: ValueError for unknown vcs_type
     """
     clientclass = get_vcs(vcs_type)
-    return clientclass(path)
+    return clientclass(path, cache)
 
 
 class VcsClient(object):

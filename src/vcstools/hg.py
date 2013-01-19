@@ -108,7 +108,7 @@ def _hg_diff_path_change(diff, path):
 
 class HgClient(VcsClientBase):
 
-    def __init__(self, path):
+    def __init__(self, path, cache=False):
         """
         :raises: VcsError if hg not detected
         """

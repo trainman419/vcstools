@@ -68,7 +68,7 @@ def _get_svn_version():
 
 class SvnClient(VcsClientBase):
 
-    def __init__(self, path):
+    def __init__(self, path, cache=False):
         """
         :raises: VcsError if python-svn not detected
         """
